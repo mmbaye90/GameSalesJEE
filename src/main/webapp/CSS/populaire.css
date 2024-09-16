@@ -1,0 +1,103 @@
+@charset "UTF-8";
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+.section{
+    display:flex;
+    margin-top:2rem;
+    margin-bottom:2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+
+}
+.interactable {
+    height: 250px;
+    width: 204px;
+    border-radius: 8px;
+    background-color: #080808;
+    position: relative;
+    transition: 0.12s ease transform, 0.44s ease width;
+    transform: perspective(4000px) rotateX(0deg) rotateY(0deg);
+    transform-style: preserve-3d;
+    font-family: system-ui;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    color: white;
+    padding: 8px;
+    
+    /* Transition state for hover */
+    cursor: pointer;
+}
+
+.interactable img {
+    height: 100%;
+    width: 100%;
+    max-width: 200px;
+    object-fit: cover;
+    border-radius: inherit;
+    z-index: 2;
+    transition: 0.44s ease width;
+}
+
+.interactable p {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+    margin-block: auto;
+    right: 20px;
+    transition: 0.3s ease opacity;
+    opacity: 0;
+}
+.contenudesc{
+  background-color: otangered;
+  display:none; 
+   height: 100%;
+   border-radius: inherit;
+    padding:0.5rem;
+}
+
+/* Hover effects */
+.interactable:hover {
+    width: 408px;
+    display:flex;
+}
+
+.interactable:hover  .contenudesc{
+    width: 408px;
+    display:flex;
+}
+
+.interactable:hover img {
+    cursor: initial;
+}
+
+.interactable:hover p {
+    opacity: 1;
+}
+
+/* 3D transform on hover */
+.interactable:hover {
+    transform: perspective(4000px) rotateX(15deg) rotateY(-15deg);
+}
+
+.interactable::before,
+.interactable::after {
+    content: "";
+    position: absolute;
+    border-radius: inherit;
+}
+
+.interactable::before {
+    transform: translateZ(-50px);
+    inset: -1em;
+    background: linear-gradient(to bottom right, red, blue);
+}
+
+.interactable::after {
+    transform: translateZ(-49px);
+    inset: 0;
+    background-color: #080808;
+    filter: blur(12px);
+}

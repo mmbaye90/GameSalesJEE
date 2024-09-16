@@ -1,0 +1,24 @@
+@charset "UTF-8";
+/* Styles personnalisés pour la page du panier */
+body {
+    background: url('https://i.postimg.cc/XYjWrv36/dark-hexagonal-background-with-gradient-color-79603-1409.jpg') no-repeat;
+    background-size: cover;
+    color: #fff;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05); /* Couleur des lignes impaires */
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Couleur au survol */
+}
+
+.quantity-group {
+    width: 120px;
+}
+
+.quantity-input {
+    width: 50px;
+}
+

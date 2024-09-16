@@ -1,0 +1,166 @@
+@charset "UTF-8";
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: url('https://i.postimg.cc/XYjWrv36/dark-hexagonal-background-with-gradient-color-79603-1409.jpg') no-repeat;
+    background-size: cover;
+    color: white;
+  }
+  
+  .product-container {
+    display: flex;
+    gap: 40px;
+  }
+  
+  .image-section {
+    flex: 1;
+  }
+  
+  .main-image-zoom {
+    width:100%;
+    height: 400px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 2px solid #ddd;
+  }
+  
+  .main-image-zoom img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: zoom-in;
+  }
+  
+  .thumbnails {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .thumbnails img,
+  .thumbnails video {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+  }
+  
+  .video-thumbnail {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+  
+  .video-thumbnail img:first-child {
+    width: 100px;
+    height: 100px;
+    border: 1px solid #ddd;
+  }
+  
+  .play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  
+  .video-thumbnail:hover .play-icon {
+    opacity: 1;
+  }
+  
+  .details-section {
+    flex: 1;
+  }
+  
+  .details-section h1 {
+    margin-bottom: 20px;
+  }
+  
+  .product-description {
+    margin-bottom: 20px;
+  }
+  
+  .product-controls {
+    margin-bottom: 20px;
+  }
+  
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .quantity-controls button {
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    line-height: 20px;
+  }
+  
+  .price-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .price {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .rating {
+    color: #FFD700;
+  }
+  
+  .release-date {
+    margin-bottom: 20px;
+  }
+  
+  .add-to-cart-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .add-to-cart-btn:hover {
+    background-color: #218838;
+  }
+  
+  /* Styles pour les étoiles */
+  .star {
+    font-size: 20px;
+    color: #FFD700;
+  }
+  
+  .star.empty {
+    color: #e0e0e0;
+  }
+  
+  .star.half {
+    background: linear-gradient(90deg, #FFD700 50%, #e0e0e0 50%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    width: 10px;
+    overflow: hidden;
+  }
+  hr{
+  height: 1rem;
+  widows:1rem;
+  border-radius:50%;
+  background-color:orangered;
+  border: 1px solid white;
+  
+  }
+  .footer{
+  margin-bottom: 0;
+  }

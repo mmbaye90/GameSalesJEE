@@ -1,0 +1,31 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300);
+
+body{
+	background: url('https://i.postimg.cc/XYjWrv36/dark-hexagonal-background-with-gradient-color-79603-1409.jpg') no-repeat;
+    background-size: cover;
+}
+
+.jumbotron-flat {
+   background-color: #4DB8FF;
+  height: 100%;
+  border: 1px solid #4DB8FF;
+  background: white;
+  width: 100%;
+text-align: center;
+overflow: auto;
+  color: black;
+}
+
+.paymentAmt {
+  color: black;
+    font-size: 80px; 
+}
+
+.centered {
+    text-align: center;
+}
+
+.title {
+ padding-top: 15px;   
+  color: black;
+}
