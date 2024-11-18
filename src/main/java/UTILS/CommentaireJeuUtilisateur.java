@@ -17,4 +17,5 @@ public class CommentaireJeuUtilisateur {
     private String jeuTitre;
     private String jeuPhoto;
     private boolean statutCom;
+    private boolean acceptation;
 }

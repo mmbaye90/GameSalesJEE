@@ -13,5 +13,6 @@ public class Utilisateur {
     private String email;
     private String password;
     private boolean isAdmin;
+    private boolean blacklisted;
     private String image;
 }

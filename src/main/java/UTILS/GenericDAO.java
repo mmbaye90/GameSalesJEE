@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import Database.ConnectionManager;
 import INTERFACE.IDAO;
@@ -165,14 +166,30 @@ public class GenericDAO<T> implements IDAO<T> {
             for (Field field : entityClass.getDeclaredFields()) {
                 field.setAccessible(true);
                 String fieldName = field.getName();
-                Object value = resultSet.getObject(fieldName);
-                field.set(obj, value);
+                Class<?> fieldType = field.getType();
+                
+                if (fieldType == String.class) {
+                    field.set(obj, resultSet.getString(fieldName));
+                } else if (fieldType == Date.class) {
+                    // Si c'est un champ Date, on effectue une conversion de java.sql.Date à java.util.Date
+                    java.sql.Date sqlDate = resultSet.getDate(fieldName);
+                    if (sqlDate != null) {
+                        field.set(obj, new Date(sqlDate.getTime())); // Conversion de java.sql.Date à java.util.Date
+                    } else {
+                        field.set(obj, null);  // Si la valeur est null dans la base, on met null
+                    }
+                } else {
+                    // Pour les autres types (int, double, etc.), on utilise getObject
+                    Object value = resultSet.getObject(fieldName);
+                    field.set(obj, value);
+                }
             }
             return obj;
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors du mapping du ResultSet à l'objet " + entityClass.getSimpleName(), e);
         }
     }
+
 
     private String getTableName() {
         if (entityClass == Plateforme.class) return "plateforme";
@@ -240,7 +257,7 @@ public class GenericDAO<T> implements IDAO<T> {
                 Jeux jeu = new Jeux();
                 jeu.setId_jeux(resultSet.getInt("id_jeux"));
                 jeu.setTitre(resultSet.getString("titre"));
-                jeu.setDate_sortie(resultSet.getDate("date_sortie"));
+                jeu.setDate_sortie(resultSet.getString("date_sortie"));
                 jeu.setLangue(resultSet.getString("langue"));
                 jeu.setPrix(resultSet.getDouble("prix"));
                 jeu.setQuantite(resultSet.getInt("quantite"));
@@ -451,7 +468,7 @@ public class GenericDAO<T> implements IDAO<T> {
         List<CommentaireJeuUtilisateur> resultList = new ArrayList<>();
 
         
-        String query = "SELECT c.id_commentaire, c.contenu, c.statut_com, u.nom AS utilisateur_nom, u.image AS utilisateur_image, "
+        String query = "SELECT c.id_commentaire, c.contenu, c.statut_com,c.accepte, u.nom AS utilisateur_nom, u.image AS utilisateur_image, "
                      + "j.id_jeux, j.titre AS jeu_titre, p.url_photo AS jeu_photo "
                      + "FROM commentaire c "
                      + "JOIN utilisateur u ON c.id_utilisateur = u.id_utilisateur "
@@ -473,11 +490,12 @@ public class GenericDAO<T> implements IDAO<T> {
                 int idJeux = rs.getInt("id_jeux");  // Récupérer l'id_jeux
                 String jeuTitre = rs.getString("jeu_titre");
                 String jeuPhoto = rs.getString("jeu_photo");
-                boolean statutCom = rs.getBoolean("statut_com");  // Récupérer le statut du commentaire
+                boolean statutCom = rs.getBoolean("statut_com");
+                boolean accepation = rs.getBoolean("accepte");
 
                 // Créer un objet CommentaireJeuUtilisateur avec tous les attributs, y compris id_jeux
                 CommentaireJeuUtilisateur commentaire = new CommentaireJeuUtilisateur(
-                    idCommentaire, contenu, utilisateurNom, utilisateurImage, idJeux, jeuTitre, jeuPhoto, statutCom
+                    idCommentaire, contenu, utilisateurNom, utilisateurImage, idJeux, jeuTitre, jeuPhoto, statutCom,accepation
                 );
                 resultList.add(commentaire);
             }
@@ -588,12 +606,251 @@ public class GenericDAO<T> implements IDAO<T> {
     }
     
     //MOYENNE JEUX PAR COMMANDE
-    
+    public double getMoyenneJeuxParCommande() {
+        String query = "SELECT AVG(d.quantite) AS moyenne_jeux_par_commande FROM detail d";
+        double moyenne = 0.0;
+
+        try (
+        	 Connection connection = ConnectionManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next()) {
+                moyenne = resultSet.getDouble("moyenne_jeux_par_commande");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Gérer l'exception de manière appropriée (logs, etc.)
+        }
+
+        return moyenne;
+    }
     
     //JEU AVEC LE PLUS DE COMMENTAIRE
+    public Optional<Map<String, Object>> getGameWithMostComments() {
+        String query = "SELECT j.titre, COUNT(cj.id_commentaire) AS total_commentaires " +
+                       "FROM jeux j " +
+                       "JOIN commentaireJeux cj ON j.id_jeux = cj.id_jeux " +
+                       "GROUP BY j.titre " +
+                       "ORDER BY total_commentaires DESC " +
+                       "LIMIT 1";
+
+        try (
+        	 
+        	 Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("titre", rs.getString("titre"));
+                    result.put("total_commentaires", rs.getInt("total_commentaires"));
+                    return Optional.of(result);  // Retourner le résultat sous forme de Map
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();  // Si aucun résultat n'est trouvé
+    }
+
     
     
-    //Nombre total de jeux par catégorie +> récupére  une liste à afficher dans le tab dashboard
+    //Nombre total de jeux par catégorie
+    public List<Map<String, Object>> getTotalGamesByCategory() {
+        String query = "SELECT c.genre, COUNT(j.id_jeux) AS total_jeux " +
+                       "FROM jeux j " +
+                       "JOIN categorie c ON j.id_categorie = c.id_categorie " +
+                       "GROUP BY c.genre";
+
+        List<Map<String, Object>> results = new ArrayList<>();
+
+        try (
+        		
+        	 Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("genre", rs.getString("genre"));
+                row.put("total_jeux", rs.getInt("total_jeux"));
+                results.add(row);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+
+    
+    //ListingForDashbord
+ // Méthode pour récupérer les commentaires avec les infos des utilisateurs et des jeux
+    public List<CommentaireJeuUtilisateur> findCommentairesJeuxUtilisateursdb() {
+        List<CommentaireJeuUtilisateur> resultList = new ArrayList<>();
+
+        
+        String query = "SELECT c.id_commentaire, c.contenu, c.statut_com, c.accepte, u.nom AS utilisateur_nom, u.image AS utilisateur_image, "
+                + "j.id_jeux, j.titre AS jeu_titre, p.url_photo AS jeu_photo "
+                + "FROM commentaire c "
+                + "JOIN utilisateur u ON c.id_utilisateur = u.id_utilisateur "
+                + "JOIN commentairejeux cj ON c.id_commentaire = cj.id_commentaire "
+                + "JOIN jeux j ON cj.id_jeux = j.id_jeux "
+                + "LEFT JOIN (SELECT id_jeux, MIN(url_photo) AS url_photo FROM photo GROUP BY id_jeux) p "
+                + "ON j.id_jeux = p.id_jeux "
+                + "LIMIT 5";
+
+        try (
+            Connection connection = ConnectionManager.getConnection();    
+            PreparedStatement ps = connection.prepareStatement(query);
+            ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                int idCommentaire = rs.getInt("id_commentaire");
+                String contenu = rs.getString("contenu");
+                String utilisateurNom = rs.getString("utilisateur_nom");
+                String utilisateurImage = rs.getString("utilisateur_image");
+                int idJeux = rs.getInt("id_jeux");  // Récupérer l'id_jeux
+                String jeuTitre = rs.getString("jeu_titre");
+                String jeuPhoto = rs.getString("jeu_photo");
+                boolean statutCom = rs.getBoolean("statut_com");  
+                boolean acceptation = rs.getBoolean("accepte");
+
+                // Créer un objet CommentaireJeuUtilisateur avec tous les attributs, y compris id_jeux
+                CommentaireJeuUtilisateur commentaire = new CommentaireJeuUtilisateur(
+                    idCommentaire, contenu, utilisateurNom, utilisateurImage, idJeux, jeuTitre, jeuPhoto, statutCom,acceptation
+                );
+                resultList.add(commentaire);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();  // Gérer les erreurs
+        }
+        return resultList;
+    }
+    
+    
+    
+    
+	/*
+	  ==================================================================
+	  ================= CHART FOR DASHBOARD ============================
+	  ==================================================================
+	*/
+    
+    //Data for Doughtnut chart 
+    public List<Map<String, Object>> getRevenuesByDate() {
+    	
+        List<Map<String, Object>> result = new ArrayList<>();
+        String query = "SELECT date_commande, SUM(total) AS total_revenu FROM commande GROUP BY date_commande ORDER BY date_commande";
+        
+        try (
+        		
+        	 Connection conn = ConnectionManager.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("date_commande", rs.getDate("date_commande"));
+                row.put("total_revenu", rs.getDouble("total_revenu"));
+                result.add(row);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        
+        return result;
+    }
+
+    
+    //Data Bar chart
+    public List<Map<String, Object>> getJeuxWithCommentsAndEvaluations() {
+        List<Map<String, Object>> results = new ArrayList<>();
+        String query = "SELECT j.titre, " 
+        			   + "(SELECT COUNT(*) FROM commentaireJeux WHERE id_jeux = j.id_jeux) AS total_commentaires, " 
+        			   +"(SELECT COUNT(*) FROM evaluation WHERE id_jeux = j.id_jeux) AS total_evaluations " 
+        			   +"FROM jeux j";
+
+        try (
+        		
+        	 Connection conn =ConnectionManager.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(query); 
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("titre", rs.getString("titre"));
+                row.put("total_commentaires", rs.getInt("total_commentaires"));
+                row.put("total_evaluations", rs.getInt("total_evaluations"));
+                results.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();  // Log the error
+        }
+
+        return results;
+    }
+
+    
+    
+    //INSERER ET RETOURNER L ID JEUX DERNIEREMNT INSERE
+    public int insertAndReturnId(T entity) throws SQLException {
+        String tableName = entity.getClass().getSimpleName().toLowerCase(); // Nom de la table basé sur le nom de la classe
+        String insertSQL = "INSERT INTO " + tableName + " (titre, date_sortie, langue, prix, quantite, id_categorie, resume) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        int generatedId = -1;
+
+        try (
+        	 
+        	 Connection connection = ConnectionManager.getConnection(); 
+             PreparedStatement statement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+
+            // Supposons que l'entity est de type `Jeux` (vous pouvez gérer cela plus génériquement si nécessaire)
+            if (entity instanceof Jeux) {
+                Jeux jeu = (Jeux) entity;
+
+                // Remplir les paramètres de la requête préparée
+                statement.setString(1, jeu.getTitre());
+                statement.setString(2, jeu.getDate_sortie()); 
+                statement.setString(3, jeu.getLangue());
+                statement.setDouble(4, jeu.getPrix());
+                statement.setInt(5, jeu.getQuantite());
+                statement.setInt(6, jeu.getId_categorie());
+                statement.setString(7, jeu.getResume());
+
+                // Exécuter l'insertion
+                int affectedRows = statement.executeUpdate();
+
+                // Vérifier si l'insertion a réussi
+                if (affectedRows > 0) {
+                    // Récupérer l'ID généré automatiquement
+                    try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            generatedId = generatedKeys.getInt(1); // Récupérer l'ID généré
+                        }
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Erreur lors de l'ajout du jeu et la récupération de l'ID.");
+        }
+
+        return generatedId;
+    }
+
+    
+    
+    
+    
+
+
+    
+    
     
     
     

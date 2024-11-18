@@ -7,7 +7,7 @@
     <title>Tableau avec Modals et Pagination</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" >
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap"
         rel="stylesheet">
 
@@ -25,25 +25,17 @@
     <!-- Template Stylesheet -->
     <link href="css1/style.css" rel="stylesheet">
 
-    <style>
-        /* CSS de la page comme précédemment */
-    </style>
+
 </head>
 
 <body>
     <div class="container-fluid position-relative d-flex p-0">
-        <div id="spinner"
-            class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-
+ 
         <!-- Sidebar Start -->
         <div class="sidebar pe-4 pb-3">
             <nav class="navbar bg-secondary navbar-dark">
                 <a href="index.html" class="navbar-brand mx-4 mb-3">
-                    <h3 class="text-primary"><i class="fa fa-user-edit me-2"></i>DarkPan</h3>
+                    <h3 class="text-primary"><i class="fa fa-user-edit me-2"></i>MM</h3>
                 </a>
                 <div class="d-flex align-items-center ms-4 mb-4">
                     <div class="position-relative">
@@ -58,26 +50,26 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href='<c:url value = "Dashboard"></c:url>' class="nav-item nav-link active"><i
+                    <a href='<c:url value='Dashboard'></c:url>' class="nav-item nav-link active"><i
                             class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
                     <div class="nav-item dropdown">
-                        <a href='<c:url value = "UsersMenagement"></c:url>' class="nav-link dropdown-toggle nav-item nav-link" data-bs-toggle="dropdown">
+                        <a href='<c:url value='UsersMenagement'></c:url>' class="nav-link dropdown-toggle nav-item nav-link" data-bs-toggle="dropdown">
                             <i class="fa fa-users me-2"></i>Gestion Users
                         </a>
                         <div class="dropdown-menu bg-transparent border-0 nav-item nav-link">
-                            <a href='<c:url value = "UsersMenagement"></c:url>' class="dropdown-item ">MenUsers</a>
+                            <a href='<c:url value='UsersMenagement'></c:url>' class="dropdown-item ">MenUsers</a>                         
                         </div>
                     </div>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
+                        <a href='<c:url value="JeuxMenagement"></c:url>' class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
                                 class="far fa-file-alt me-2"></i>Gestion Jeux</a>
                         <div class="dropdown-menu bg-transparent border-0">
-                            <a href='<c:url value = "JeuxMenagement"></c:url>' class="dropdown-item">Jeux Men</a>
+                            <a href='<c:url value ="JeuxMenagement"></c:url>' class="dropdown-item">Jeux Men</a>
                         </div>
                     </div>
 
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
+                        <a href='<c:url value ="MsgMenagement"></c:url>' class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
                                 class="fa-regular fa-envelope me-2"></i>
                             Gestion Msg
                         </a>
@@ -203,45 +195,44 @@
                     <table id="dataTable">
                         <thead>
                             <tr>
+                                <th>Img</th>
                                 <th>Nom</th>
                                 <th>Email</th>
-                                <th>Téléphone</th>
-                                <th>Adresse</th>
+                                <th>IsAdmin</th>
+                                <th>BlackListed</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Jean Dupont</td>
-                                <td>jean.dupont@example.com</td>
-                                <td>0123456789</td>
-                                <td>1 Rue de Paris</td>
-                                <td>
-                                    <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
-                                    <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Marie Curie</td>
-                                <td>marie.curie@example.com</td>
-                                <td>0987654321</td>
-                                <td>2 Rue de Lyon</td>
-                                <td>
-                                    <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
-                                    <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Albert Einstein</td>
-                                <td>albert.einstein@example.com</td>
-                                <td>0456789123</td>
-                                <td>3 Rue de Berlin</td>
-                                <td>
-                                    <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
-                                    <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <!-- Ajoutez plus de lignes ici -->
+                          <c:forEach var="u" items="${sessionScope.listUsers}">
+	                            <tr>
+	                                <td><img alt=">" src="${u.image}" style="height: 2.5rem;width:2.5rem;border-radius:50%;"></td>
+	                                <td>${u.nom}</td>
+	                                <td>${u.email}</td>
+	                                <td>
+	                                	<c:choose>
+	                                		<c:when test="${u.admin}">
+	                                			<small class="text-success"><i class="fa-solid fa-circle-check"></i></small>
+	                                		</c:when>
+	                                		<c:otherwise>
+	                                			<small class="text-danger"><i class="fa-solid fa-circle-xmark"></i></small>
+	                                		</c:otherwise>
+	                                	</c:choose>
+	                                </td>
+	                                <td>${u.blacklisted}</td>
+	                                <td>
+	                                     <button class="action-btn edit-btn" onclick="sendId(${u.id_utilisateur})">
+    										<i class="fas fa-edit"></i>
+										</button>
+
+	                                    <a 
+	                                   		href="UsersMenagement?idToTrash=${u.id_utilisateur}" 
+	                                   		class="action-btn delete-btn">
+	                                    	<i class="fas fa-trash"></i>
+	                                    </a>
+	                                </td>
+	                            </tr>
+ 							</c:forEach>
                         </tbody>
                     </table>
                 </div>
@@ -253,15 +244,26 @@
             <div id="addUserModal" class="modal m-4" style="display: none;">
                 <div class="modal-content">
                     <h2>Ajouter un utilisateur</h2>
-                    <form>
+                    <form method="post">
                         <label for="addUserName">Nom:</label>
-                        <input type="text" id="addUserName" required>
+                        <input type="text" id="addUserName" required name="name">
+                        
                         <label for="addUserEmail">Email:</label>
-                        <input type="email" id="addUserEmail" required>
-                        <label for="addUserPhone">Téléphone:</label>
-                        <input type="text" id="addUserPhone" required>
-                        <label for="addUserAddress">Adresse:</label>
-                        <input type="text" id="addUserAddress" required>
+                        <input type="email" id="addUserEmail" required name="email">
+                        
+                        <label for="addUserPassword">Password:</label>
+                        <input type="password" id="addUserPassword" required name ="password">
+                        
+                        <div style="display: flex;">
+	                        <label for="addUserIsAdmin">IsAdmin:</label>
+	                        <input type="checkbox" id="addUserIsAdmin" name = "isAdmin" class="mx-4">
+                        </div>
+                        
+                        <div style="display: flex;">
+	                        <label for="addUserAddress">BlackListed:</label>
+	                        <input type="checkbox" id="addUserAddress" name = "isBlacklisted" value="false" disabled="disabled"class="mx-3">
+                        </div>
+                        
                         <div>
                             <button type="submit">Enregistrer</button>
                             <button type="button" class="close">Annuler</button>
@@ -270,19 +272,31 @@
                 </div>
             </div>
 
+
             <!-- Modal pour Modifier -->
             <div id="editUserModal" class="modal m-4" style="display: none;">
                 <div class="modal-content">
                     <h2>Modifier un utilisateur</h2>
-                    <form>
+                    <form method="post">
+                    	
+                    	<input type="hidden" name="idUserToUpdate" id="idUser">
+                    
                         <label for="editUserName">Nom:</label>
-                        <input type="text" id="editUserName" required>
-                        <label for="editUserEmail">Email:</label>
-                        <input type="email" id="editUserEmail" required>
-                        <label for="editUserPhone">Téléphone:</label>
-                        <input type="text" id="editUserPhone" required>
-                        <label for="editUserAddress">Adresse:</label>
-                        <input type="text" id="editUserAddress" required>
+                        <input type="text" id="editUserName" required name ="nameMod">
+                        
+                        <label for="editUserEmail">Email:</label> 
+                        <input type="email" id="editUserEmail" required  name ="emailMod">
+                        
+                        <div style="display: flex">
+                        	<label for="editUserPhone">IsAdmin:</label>
+                        	<input type="checkbox" id="editUserPhone"  class ='mx-5' name ="adminMod">
+                        </div>
+                        
+                        <div style="display: flex">
+                        	<label for="editUserAddress">BlackListed:</label>
+                        	<input type="checkbox" id="editUserAddress"  class ='mx-5' name ="blacklistedMod">
+                        </div>
+                        
                         <div>
                             <button type="submit">Enregistrer</button>
                             <button type="button" class="close">Annuler</button>
@@ -313,6 +327,9 @@
     <script src="js1/main.js"></script>
 
     <script>
+   
+    document.addEventListener('DOMContentLoaded', () => {
+        
         const searchInput = document.querySelector('#searchInput');
         const tableBody = document.querySelector('#dataTable tbody');
         const paginationDiv = document.querySelector('.pagination');
@@ -321,30 +338,38 @@
         const editUserModal = document.querySelector('#editUserModal');
         let currentPage = 1;
         let pageSize = parseInt(pageSizeSelect.value);
+        let filteredRows = [];
 
         function renderTable() {
             const searchTerm = searchInput.value.toLowerCase();
-            const rows = Array.from(document.querySelectorAll('#dataTable tbody tr'));
+            const rows = Array.from(tableBody.querySelectorAll('tr'));
 
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                const matches = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(searchTerm));
-                row.style.display = matches ? '' : 'none';
+            filteredRows = rows.filter(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                return cells.some(cell => cell.textContent.toLowerCase().includes(searchTerm));
             });
 
-            renderPagination(rows.filter(row => row.style.display === '').length);
+            console.log('Filtered Rows:', filteredRows);
+            if (filteredRows.length === 0) {
+                console.warn('No rows found for the search term.');
+            }
+
+            renderPagination();
+            updateTableDisplay();
         }
 
-        function renderPagination(filteredRows) {
+        function renderPagination() {
             paginationDiv.innerHTML = '';
-
-            const totalItems = filteredRows;
+            const totalItems = filteredRows.length;
             const totalPages = Math.ceil(totalItems / pageSize);
 
             for (let i = 1; i <= totalPages; i++) {
                 const button = document.createElement('button');
                 button.textContent = i;
-                button.classList.toggle('active', i === currentPage);
+                button.classList.add('page-btn');
+                if (i === currentPage) {
+                    button.classList.add('active');
+                }
                 button.addEventListener('click', () => {
                     currentPage = i;
                     updateTableDisplay();
@@ -354,23 +379,34 @@
         }
 
         function updateTableDisplay() {
-            const rows = Array.from(document.querySelectorAll('#dataTable tbody tr')).filter(row => row.style.display === '');
+            if (!Array.isArray(filteredRows)) {
+                console.error('filteredRows is not an array:', filteredRows);
+                return;
+            }
 
-            rows.forEach((row, index) => {
-                row.style.display = (index >= (currentPage - 1) * pageSize && index < currentPage * pageSize) ? '' : 'none';
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+
+            // Masquer toutes les lignes du tableau
+            tableBody.querySelectorAll('tr').forEach(row => row.style.display = 'none');
+
+            // Afficher uniquement les lignes filtrées et paginées
+            filteredRows.forEach((row, index) => {
+                if (index >= start && index < end) {
+                    row.style.display = '';
+                }
             });
         }
 
         searchInput.addEventListener('input', () => {
-            currentPage = 1;
+            currentPage = 1; // Réinitialiser à la première page lors de la recherche
             renderTable();
-            updateTableDisplay();
         });
 
         pageSizeSelect.addEventListener('change', () => {
             pageSize = parseInt(pageSizeSelect.value);
-            currentPage = 1;
-            updateTableDisplay();
+            currentPage = 1; // Réinitialiser à la première page lors du changement de taille de page
+            renderTable();
         });
 
         document.querySelector('#addButton').addEventListener('click', () => {
@@ -386,29 +422,46 @@
             editUserModal.style.display = 'none';
         }
 
-        // Gestionnaire d'événements pour les boutons de modification
-        document.querySelectorAll('.edit-btn').forEach((button, index) => {
+        document.querySelectorAll('.edit-btn').forEach((button) => {
             button.addEventListener('click', () => {
                 const row = button.closest('tr');
-                const name = row.children[0].textContent;
-                const email = row.children[1].textContent;
-                const phone = row.children[2].textContent;
-                const address = row.children[3].textContent;
+                const cells = row.querySelectorAll('td');
+                const name = cells[1].textContent;
+                const email = cells[2].textContent;
+                const phone = cells[3].textContent;
+                const address = cells[4].textContent;
 
-                // Remplir le formulaire du modal de modification avec les données de la ligne
                 document.querySelector('#editUserName').value = name;
                 document.querySelector('#editUserEmail').value = email;
                 document.querySelector('#editUserPhone').value = phone;
                 document.querySelector('#editUserAddress').value = address;
 
-                // Afficher le modal de modification
                 editUserModal.style.display = 'flex';
             });
         });
 
-        // Initial rendering
-        renderTable();
-        updateTableDisplay();
+
+
+
+
+        renderTable(); // Initial rendering
+
+        
+    });
+
+
+	
+    function sendId(id) {
+        // Affiche l'ID dans la console pour vérifier qu'il est bien récupéré
+        console.log("ID récupéré => " + id);
+
+        // Associe l'ID récupéré au champ caché du formulaire
+        document.getElementById('idUser').value = id;
+
+        // Ouvre la modale d'édition
+        document.getElementById('editUserModal').style.display = 'flex';
+    }
+       	
     </script>
 </body>
 

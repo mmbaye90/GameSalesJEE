@@ -27,7 +27,7 @@ public class CommentaireServlet extends HttpServlet {
         String contenuCom = request.getParameter("contenu");
         String idJeuxreq= request.getParameter("id_jeux");
         
-        int idUtilisateur = 1;  // Supposons que l'utilisateur connecté ait un id 1 (A récupérer dynamiquement via La SESSIOn du user conn)
+        int idUtilisateur = 1; 
 
         if (contenuCom != null && idJeuxreq!=null) {
         	int idJeux = Integer.parseInt(idJeuxreq);

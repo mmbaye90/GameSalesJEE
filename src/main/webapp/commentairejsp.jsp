@@ -44,7 +44,7 @@
                         </p>
                     </div>  
                     <p class="card-text">${commentaire.contenu}</p>
-                    <!-- Bouton pour ouvrir le modal -->
+                    <!-- Bouton pour ouvrir le modal Caché si user non connecté-->
                        		<c:choose>
 			<c:when test="${not empty sessionScope.user }">
 				    <button class="btn btn-primary" onclick="openCommentModal(${commentaire.idCommentaire})">

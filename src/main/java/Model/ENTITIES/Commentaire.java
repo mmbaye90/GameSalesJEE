@@ -12,4 +12,5 @@ public class Commentaire {
 	private String contenu;
 	private boolean statut_com;
 	private int id_utilisateur;
+	private boolean accepte;
 }

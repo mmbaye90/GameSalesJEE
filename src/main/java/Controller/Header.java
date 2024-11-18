@@ -25,9 +25,7 @@ import UTILS.Panier;
 public class Header extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    public Header() {
-        ConnectionManager.getConnection();
-    }
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 

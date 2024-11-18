@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class Jeux {
 	private int id_jeux;
     private String titre;
-    private Date date_sortie;
+    private String date_sortie;
     private String langue;
     private double prix;
     private int quantite;

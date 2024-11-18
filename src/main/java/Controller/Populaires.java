@@ -34,7 +34,7 @@ public class Populaires extends HttpServlet {
             HttpSession session = request.getSession(true);
             session.setAttribute("jeuxPop", popularGame);
 
-            // Forward vers la JSP
+            
             request.getRequestDispatcher("populaire.jsp").forward(request, response);
 
         } catch (Exception e) {
