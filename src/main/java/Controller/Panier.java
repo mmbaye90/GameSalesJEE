@@ -78,6 +78,12 @@ public class Panier extends HttpServlet {
             session.setAttribute("panier", panier);
         }
         
+        //GESTION VALIDATION COMMANDE
+        if(request.getParameter("btn") != null) {
+        	request.getRequestDispatcher("ValidationCommande").forward(request, response);
+        	return;
+        };
+        
 		
 		request.getRequestDispatcher("panier.jsp").forward(request, response);
 	}
